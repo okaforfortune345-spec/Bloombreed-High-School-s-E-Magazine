@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bloombreed Schools Day E-magazine</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Base Styles & Variables */
+        :root {
+            --primary-red: #E63946;
+            --primary-blue: #1D3557;
+            --primary-yellow: #FFB703;
+            --light-bg: #F1FAEE;
+            --white: #FFFFFF;
+            --gray-light: #F8F9FA;
+            --gray: #6c757d;
+            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        /* Logo corner */
+    .logo-corner {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      z-index: 999;
+    }
+    .logo-corner img {
+      width: 70px;
+      height: auto;
+      border-radius: 8px;
+    }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: var(--font-main);
+            background-color: var(--light-bg);
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        /* Layout */
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Side Navigation */
+        .sidenav {
+            width: 250px;
+            background: var(--primary-blue);
+            color: var(--white);
+            padding: 20px 0;
+            transition: all 0.3s ease;
+        }
+        
+        .logo {
+            padding: 0 20px 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .logo h1 {
+            font-size: 1.5rem;
+            color: var(--white);
+            margin-top: 10px;
+        }
+        
+        .nav-item {
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .nav-item.active {
+            background: var(--primary-red);
+        }
+        
+        .nav-item i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .expandable {
+            position: relative;
+        }
+        
+        .submenu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            background: rgba(0, 0, 0, 0.2);
+        }
+        
+        .submenu.open {
+            max-height: 500px;
+        }
+        
+        .submenu .nav-item {
+            padding-left: 50px;
+        }
+        
+        .expand-icon {
+            position: absolute;
+            right: 20px;
+            transition: transform 0.3s;
+        }
+        
+        .expand-icon.rotated {
+            transform: rotate(180deg);
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .page-title {
+            color: var(--primary-blue);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary-yellow);
+        }
+        
+        /* Magazine Grid */
+        .magazine-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+        
+        .post-card {
+            background: var(--white);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+        
+        .post-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .post-image {
+            height: 200px;
+            overflow: hidden;
+        }
+        
+        .post-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+        
+        .post-card:hover .post-image img {
+            transform: scale(1.05);
+        }
+        
+        .video-container {
+            position: relative;
+            padding-top: 56.25%; /* 16:9 Aspect Ratio */
+        }
+        
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        .post-content {
+            padding: 20px;
+        }
+        
+        .post-category {
+            display: inline-block;
+            background: var(--primary-red);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-bottom: 10px;
+        }
+        
+        .post-title {
+            color: var(--primary-blue);
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+        
+        .post-excerpt {
+            color: var(--gray);
+            margin-bottom: 15px;
+        }
+        
+        .post-meta {
+            display: flex;
+            justify-content: space-between;
+            color: var(--gray);
+            font-size: 0.9rem;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+        }
+        
+        /* Mobile Navigation Toggle */
+        .mobile-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px;
+            z-index: 1000;
+            cursor: pointer;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .sidenav {
+                width: 200px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .sidenav {
+                width: 100%;
+                position: fixed;
+                height: 100vh;
+                z-index: 100;
+                transform: translateX(-100%);
+            }
+            
+            .sidenav.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding-top: 70px;
+            }
+            
+            .mobile-toggle {
+                display: block;
+            }
+            
+            .magazine-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Filtering */
+        .filtered {
+            display: none;
+        }
+        
+        /* Utility Classes */
+        .text-red { color: var(--primary-red); }
+        .text-blue { color: var(--primary-blue); }
+        .text-yellow { color: var(--primary-yellow); }
+        
+        .bg-red { background-color: var(--primary-red); }
+        .bg-blue { background-color: var(--primary-blue); }
+        .bg-yellow { background-color: var(--primary-yellow); }
+    </style>
+</head>
+<body>
+    <!-- Mobile Navigation Toggle -->
+    <button class="mobile-toggle" id="navToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="container">
+        <!-- Side Navigation -->
+        <nav class="sidenav" id="sidenav">
+            <div class="logo">
+                <h1>Bloombreed <span class="text-yellow">E-magazine</span></h1>
+            </div>
+            
+            <div class="nav-item active" data-filter="all">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </div>
+            
+            <div class="nav-item" data-filter="latest">
+                <i class="fas fa-newspaper"></i>
+                <span>Latest News</span>
+            </div>
+            
+            <div class="nav-item" data-filter="articles">
+                <i class="fas fa-book-open"></i>
+                <span>Articles</span>
+            </div>
+            
+            <div class="nav-item expandable" id="expandableNav">
+                <i class="fas fa-layer-group"></i>
+                <span>Other Categories</span>
+                <i class="fas fa-chevron-down expand-icon"></i>
+            </div>
+            
+            <div class="submenu" id="submenu">
+                <div class="nav-item" data-filter="events">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>School Events</span>
+                </div>
+                
+                <div class="nav-item" data-filter="sports">
+                    <i class="fas fa-basketball-ball"></i>
+                    <span>Sports</span>
+                </div>
+                
+                <div class="nav-item" data-filter="arts">
+                    <i class="fas fa-paint-brush"></i>
+                    <span>Arts & Culture</span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <h2 class="page-title">Latest Updates</h2>
+            
+            <div class="magazine-grid">
+                <!-- Post 1 -->
+                <div class="post-card" data-category="latest">
+                    <div class="post-image">
+                        <img src="data:image/jpeg;base64,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" alt="Students in classroom">
+                    </div>
+                    <div class="post-content">
+                        <span class="post-category bg-red">Latest News</span>
+                        <h3 class="post-title">New Science Lab Inauguration</h3>
+                        <p class="post-excerpt">Our new state-of-the-art science laboratory was inaugurated today, providing students with advanced facilities for practical learning.</p>
+                        <div class="post-meta">
+                            <span><i class="far fa-calendar"></i> May 15, 2023</span>
+                            <span><i class="far fa-clock"></i> 3 min read</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Post 2 -->
+                <div class="post-card" data-category="articles">
+                    <div class="post-image">
+                        <img src="https://images.unsplash.com/photo-1501504905252-473c47e087f8?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&q=80" alt="Student reading">
+                    </div>
+                    <div class="post-content">
+                        <span class="post-category bg-blue">Article</span>
+                        <h3 class="post-title">The Importance of Reading Habits</h3>
+                        <p class="post-excerpt">How developing consistent reading habits from an early age shapes cognitive abilities and academic performance.</p>
+                        <div class="post-meta">
+                            <span><i class="far fa-calendar"></i> May 12, 2023</span>
+                            <span><i class="far fa-clock"></i> 5 min read</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Post 3 -->
+                <div class="post-card" data-category="events">
+                    <div class="video-container">
+                        <iframe src="https://www.youtube.com/embed/6N1LkHZ7DqQ" title="Annual Day Performance" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                    <div class="post-content">
+                        <span class="post-category bg-yellow" style="color: #333;">School Event</span>
+                        <h3 class="post-title">Annual Day Celebrations 2023</h3>
+                        <p class="post-excerpt">Highlights from our spectacular Annual Day celebrations featuring talented performances from students across all grades.</p>
+                        <div class="post-meta">
+                            <span><i class="far fa-calendar"></i> May 10, 2023</span>
+                            <span><i class="far fa-clock"></i> 10 min watch</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Post 4 -->
+                <div class="post-card" data-category="sports">
+                    <div class="post-image">
+                        <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&q=80" alt="Basketball game">
+                    </div>
+                    <div class="post-content">
+                        <span class="post-category bg-red">Sports</span>
+                        <h3 class="post-title">Inter-School Basketball Championship</h3>
+                        <p class="post-excerpt">Our senior basketball team secured second place in the regional inter-school championship after an intense final match.</p>
+                        <div class="post-meta">
+                            <span><i class="far fa-calendar"></i> May 8, 2023</span>
+                            <span><i class="far fa-clock"></i> 2 min read</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Post 5 -->
+                <div class="post-card" data-category="arts">
+                    <div class="post-image">
+                        <img src="https://images.unsplash.com/photo-1541961017774-22349e4a1262?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&q=80" alt="Student art">
+                    </div>
+                    <div class="post-content">
+                        <span class="post-category bg-blue">Arts & Culture</span>
+                        <h3 class="post-title">Student Art Exhibition Opens</h3>
+                        <p class="post-excerpt">The annual student art exhibition is now open, showcasing incredible talent across various mediums from our young artists.</p>
+                        <div class="post-meta">
+                            <span><i class="far fa-calendar"></i> May 5, 2023</span>
+                            <span><i class="far fa-clock"></i> 4 min read</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Post 6 -->
+                <div class="post-card" data-category="latest">
+                    <div class="post-image">
+                        <img src="https://images.unsplash.com/photo-1523580494863-6f3031224c94?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&q=80" alt="Graduation">
+                    </div>
+                    <div class="post-content">
+                        <span class="post-category bg-yellow" style="color: #333;">Latest News</span>
+                        <h3 class="post-title">Class of 2023 Graduation Ceremony</h3>
+                        <p class="post-excerpt">We celebrated our graduating class of 2023 with a memorable ceremony attended by families, faculty, and distinguished guests.</p>
+                        <div class="post-meta">
+                            <span><i class="far fa-calendar"></i> May 3, 2023</span>
+                            <span><i class="far fa-clock"></i> 3 min read</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile navigation toggle
+            const navToggle = document.getElementById('navToggle');
+            const sidenav = document.getElementById('sidenav');
+            
+            navToggle.addEventListener('click', function() {
+                sidenav.classList.toggle('active');
+            });
+            
+            // Expandable submenu
+            const expandableNav = document.getElementById('expandableNav');
+            const submenu = document.getElementById('submenu');
+            const expandIcon = expandableNav.querySelector('.expand-icon');
+            
+            expandableNav.addEventListener('click', function() {
+                submenu.classList.toggle('open');
+                expandIcon.classList.toggle('rotated');
+            });
+            
+            // Filtering functionality
+            const navItems = document.querySelectorAll('.nav-item');
+            const postCards = document.querySelectorAll('.post-card');
+            
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    // Remove active class from all items
+                    navItems.forEach(navItem => {
+                        navItem.classList.remove('active');
+                    });
+                    
+                    // Add active class to clicked item
+                    this.classList.add('active');
+                    
+                    // Get filter value
+                    const filterValue = this.getAttribute('data-filter');
+                    
+                    // Filter posts
+                    postCards.forEach(card => {
+                        if (filterValue === 'all') {
+                            card.classList.remove('filtered');
+                        } else {
+                            if (card.getAttribute('data-category') === filterValue) {
+                                card.classList.remove('filtered');
+                            } else {
+                                card.classList.add('filtered');
+                            }
+                        }
+                    });
+                    
+                    // Update page title
+                    const pageTitle = document.querySelector('.page-title');
+                    if (filterValue === 'all') {
+                        pageTitle.textContent = 'Latest Updates';
+                    } else {
+                        const categoryName = this.querySelector('span').textContent;
+                        pageTitle.textContent = categoryName;
+                    }
+                    
+                    // Close navigation on mobile after selection
+                    if (window.innerWidth <= 768) {
+                        sidenav.classList.remove('active');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+<!-- Logo in corner -->
+  <div class="logo-corner">
+    <img src="https://tse1.mm.bing.net/th/id/OIP.BLhdNbDc0Z4mcX9_BaZwugHaHT?rs=1&pid=ImgDetMain&o=7&rm=3" alt="Logo" />
+  </div>
+</html>
